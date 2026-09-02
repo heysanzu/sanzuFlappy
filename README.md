@@ -5,7 +5,7 @@ A lightweight, browser-based Flappy Bird clone built with HTML5, CSS, and JavaSc
 Fly through endless obstacles in this web-based `Flappy` game!
 
 [![Play Game](https://img.shields.io/badge/▶_Play-Game-success?style=for-the-badge&logo=gamepad)](https://heysanzu.github.io/sanzuFlappy)
-[![Download APK](https://img.shields.io/badge/_Download-APK-blue?style=for-the-badge&logo=github)](https://github.com/heysanzu/sanzuFlappy/releases/download/Flappy_v1.0/flappy.apk)
+[![Download APP](https://img.shields.io/badge/_Download-APP-blue?style=for-the-badge&logo=github)](https://github.com/heysanzu/sanzuFlappy/releases/download/Flappy_v1.0/flappy.apk)
 
 ![Thumbnail](src/flappyUI.png)
 

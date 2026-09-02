@@ -1,4 +1,3 @@
-// ── CANVAS SETUP ─────────────────────────────────────────────
 const canvas = document.getElementById('game-canvas');
 const ctx    = canvas.getContext('2d');
 
@@ -11,20 +10,17 @@ function resize() {
 resize();
 window.addEventListener('resize', () => { resize(); if (state === 'idle') drawIdle(); });
 
-// ── UI REFS ───────────────────────────────────────────────────
 const uiEl      = document.getElementById('ui');
 const scoreChip = document.getElementById('score-chip');
 const startBtn  = document.getElementById('start-btn');
 const muteBtn   = document.getElementById('mute-btn');
 const muteIcon  = document.getElementById('mute-icon');
 
-// ── AUTO-HIDE UI ──────────────────────────────────────────────
 let gameStarted = false;
 
 function hideUI() { uiEl.classList.add('hidden'); }
 function showUI() { uiEl.classList.remove('hidden'); }
 
-// ── MUTE ──────────────────────────────────────────────────────
 let muted = false;
 
 muteBtn.addEventListener('click', () => {
@@ -33,77 +29,19 @@ muteBtn.addEventListener('click', () => {
     muteIcon.alt = muted ? 'mute' : 'unmute';
 });
 
-// ── AUDIO ─────────────────────────────────────────────────────
-let audioCtx = null;
-
-function getAudio() {
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    return audioCtx;
-}
-
-// Try src/sounds/ first; fall back to procedural synthesis
-function trySound(file, fallback) {
+function playSound(file) {
     if (muted) return;
-    const ac = getAudio();
-    fetch('src/sounds/' + file)
-        .then(r => { if (!r.ok) throw new Error(); return r.arrayBuffer(); })
-        .then(buf => ac.decodeAudioData(buf))
-        .then(decoded => {
-            const src = ac.createBufferSource();
-            src.buffer = decoded;
-            src.connect(ac.destination);
-            src.start();
-        })
-        .catch(() => fallback(ac));
+    const audio = new Audio('src/sounds/' + file);
+    audio.play().catch(() => {});
 }
 
-function synthFlap(ac) {
-    const osc  = ac.createOscillator();
-    const gain = ac.createGain();
-    osc.connect(gain); gain.connect(ac.destination);
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(520, ac.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(300, ac.currentTime + 0.12);
-    gain.gain.setValueAtTime(0.22, ac.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.14);
-    osc.start(); osc.stop(ac.currentTime + 0.15);
-}
+function playFlap()  { playSound('flap.mp3');  }
+function playScore() { playSound('score.mp3'); }
+function playDie()   { playSound('die.mp3');   }
 
-function synthScore(ac) {
-    [660, 880].forEach((freq, i) => {
-        const osc  = ac.createOscillator();
-        const gain = ac.createGain();
-        osc.connect(gain); gain.connect(ac.destination);
-        osc.type = 'triangle';
-        const t = ac.currentTime + i * 0.09;
-        osc.frequency.setValueAtTime(freq, t);
-        gain.gain.setValueAtTime(0.18, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
-        osc.start(t); osc.stop(t + 0.13);
-    });
-}
-
-function synthDie(ac) {
-    const osc  = ac.createOscillator();
-    const gain = ac.createGain();
-    osc.connect(gain); gain.connect(ac.destination);
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(280, ac.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(55, ac.currentTime + 0.38);
-    gain.gain.setValueAtTime(0.28, ac.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.4);
-    osc.start(); osc.stop(ac.currentTime + 0.42);
-}
-
-function playFlap()  { trySound('flap.mp3',  synthFlap);  }
-function playScore() { trySound('score.mp3', synthScore); }
-function playDie()   { trySound('die.mp3',   synthDie);   }
-
-// ── BIRD IMAGE ────────────────────────────────────────────────
 const birdImg = new Image();
 birdImg.src = 'src/sanzu.png';
 
-// ── CONSTANTS ─────────────────────────────────────────────────
 const CFG = {
     gravity:      0.42,
     flapForce:   -7.8,
@@ -114,12 +52,9 @@ const CFG = {
     birdSize:     38,
 };
 
-// gap scales with screen height so it stays fair on all devices
 function pipeGap() { return Math.max(140, H * 0.22); }
 
-// ── STATE ─────────────────────────────────────────────────────
 let bird, pipes, score, best, frame, animId, state;
-// state: 'idle' | 'playing' | 'dead'
 
 best = 0;
 
@@ -135,7 +70,6 @@ function resetGame() {
     scoreChip.textContent = '0';
 }
 
-// ── PIPES ─────────────────────────────────────────────────────
 function spawnPipe() {
     const gap    = pipeGap();
     const usable = H - CFG.groundH - 60;
@@ -143,7 +77,6 @@ function spawnPipe() {
     pipes.push({ x: W + CFG.pipeWidth, topH, scored: false });
 }
 
-// ── DRAW ──────────────────────────────────────────────────────
 function drawBackground() {
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, W, H);
@@ -184,13 +117,12 @@ function drawBird() {
     if (birdImg.complete && birdImg.naturalWidth > 0) {
         ctx.drawImage(birdImg, -s / 2, -s / 2, s, s);
     } else {
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = '#000000';
         ctx.beginPath(); ctx.arc(0, 0, s / 2, 0, Math.PI * 2); ctx.fill();
     }
     ctx.restore();
 }
 
-// gentle bob on idle screen
 function drawIdle() {
     drawBackground();
     drawGround();
@@ -198,7 +130,6 @@ function drawIdle() {
     drawBird();
 }
 
-// ── COLLISION ─────────────────────────────────────────────────
 function hitTest() {
     const r   = CFG.birdSize / 2 - 5;
     const gap = pipeGap();
@@ -216,16 +147,12 @@ function hitTest() {
     return false;
 }
 
-// ── FLAP ──────────────────────────────────────────────────────
 function flap() {
     if (state === 'dead') return;
     if (state === 'idle') { startGame(); return; }
     bird.vy = CFG.flapForce;
     playFlap();
 }
-
-// ── GAME OVER ─────────────────────────────────────────────────
-
 
 function onDead() {
     state       = 'dead';
@@ -235,7 +162,6 @@ function onDead() {
     playDie();
 
     setTimeout(() => {
-        // restartGame rebuilds uiEl.innerHTML entirely — same pattern as gameDrive
         uiEl.innerHTML = `
             <h1>Flappy</h1>
             <p class="gameover-score">Score &nbsp; ${score}</p>
@@ -249,7 +175,6 @@ function onDead() {
     }, 550);
 }
 
-// ── LOOP ──────────────────────────────────────────────────────
 function loop() {
     animId = requestAnimationFrame(loop);
 
@@ -283,7 +208,6 @@ function loop() {
     drawBird();
 }
 
-// ── START ─────────────────────────────────────────────────────
 function startGame() {
     gameStarted = true;
     resetGame();
@@ -291,7 +215,6 @@ function startGame() {
     state = 'playing';
 }
 
-// ── INPUT ─────────────────────────────────────────────────────
 document.addEventListener('keydown', e => {
     if (e.code === 'Space' || e.code === 'ArrowUp') { e.preventDefault(); flap(); }
 });
@@ -300,7 +223,6 @@ canvas.addEventListener('pointerdown', e => { e.preventDefault(); flap(); });
 
 startBtn.addEventListener('click', flap);
 
-// ── BOOT ──────────────────────────────────────────────────────
 resetGame();
 state = 'idle';
 loop();

@@ -1,141 +1,164 @@
 @font-face {
-  font-family: "Sanzu";
-  src: url("https://github.com/heysanzu/sanzu/raw/main/fonts/comic_sans_regular.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
+    font-family: 'SanzuFont';
+    src: url('fonts/comic_sans_regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
 }
 
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-:root {
-  --black: #0d0d0d;
-  --white: #f5f5f5;
-  --grey-light: #e0e0e0;
-  --grey-mid: #9e9e9e;
-  --grey-dark: #3a3a3a;
-  --font: "Sanzu", "Comic Sans MS", cursive;
-}
+*, *::before, *::after { box-sizing: border-box; }
 
 html, body {
-  width: 100%;
-  height: 100%;
-  background: var(--black);
-  overflow: hidden;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #111;
+    font-family: 'SanzuFont', 'Comic Sans MS', cursive;
+    color: #111;
 }
 
-body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font);
+canvas {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
 }
 
-/* Canvas fills the viewport, capped at a sensible game width */
-#gameCanvas {
-  display: block;
-  background: var(--black);
-  touch-action: none;
+/* ── UI panel ─────────────────────────────────────────────── */
+
+#ui {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #ffffff;
+    color: #111;
+    padding: clamp(10px, 2vw, 20px) clamp(12px, 2.5vw, 24px);
+    border-radius: 10px;
+    border: 2px solid #111;
+    z-index: 10;
+    width: clamp(200px, 42vw, 340px);
+    text-align: center;
+    opacity: 1;
+    transition: opacity 0.15s ease;
+    pointer-events: auto;
 }
 
-/* ── Overlay ─────────────────────────────────────────────── */
-
-.overlay {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-  background: rgba(13, 13, 13, 0.82);
-  backdrop-filter: blur(2px);
-  transition: opacity 0.25s ease;
+#ui.hidden {
+    opacity: 0;
+    pointer-events: none;
 }
 
-.overlay.hidden {
-  opacity: 0;
-  pointer-events: none;
+h1 {
+    margin: 0 0 clamp(6px, 1.2vw, 12px) 0;
+    font-size: clamp(1.4rem, 4vw, 2.2rem);
+    text-align: center;
+    color: #111;
+    border-bottom: 2px solid #111;
+    padding-bottom: clamp(4px, 0.8vw, 8px);
 }
 
-.overlay-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: clamp(12px, 3vw, 22px);
+p {
+    font-size: clamp(0.7rem, 2vw, 1rem);
+    text-align: center;
+    margin: clamp(4px, 1vw, 8px) 0;
+    color: #444;
+    line-height: 1.4;
 }
 
-.game-title {
-  font-family: var(--font);
-  font-size: clamp(2.8rem, 10vw, 5.5rem);
-  color: var(--white);
-  letter-spacing: -0.02em;
-  line-height: 1;
+#start-btn {
+    display: block;
+    font-family: 'SanzuFont', 'Comic Sans MS', cursive;
+    font-size: clamp(1rem, 3vw, 1.4rem);
+    padding: clamp(6px, 1.2vw, 10px) clamp(12px, 2.5vw, 20px);
+    margin: clamp(8px, 1.5vw, 14px) auto 0;
+    background: #111;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.2s, color 0.2s;
 }
 
-.overlay-score {
-  font-size: clamp(1rem, 3.5vw, 1.6rem);
-  color: var(--grey-light);
+#start-btn:hover,
+#start-btn:active {
+    background: #fff;
+    color: #111;
+    outline: 2px solid #111;
 }
 
-.overlay-best {
-  font-size: clamp(0.8rem, 2.5vw, 1.1rem);
-  color: var(--grey-mid);
+#ui a.gh-link {
+    display: block;
+    font-size: clamp(0.65rem, 1.8vw, 0.9rem);
+    color: #555;
+    text-decoration: none;
+    margin-top: clamp(6px, 1.2vw, 10px);
+    border-top: 1px solid #ddd;
+    padding-top: clamp(5px, 1vw, 8px);
+    text-align: center;
 }
 
-.hidden {
-  display: none !important;
+#ui a.gh-link:hover { color: #111; }
+
+/* ── Score chip ───────────────────────────────────────────── */
+
+#score-chip {
+    position: fixed;
+    top: clamp(8px, 2vw, 20px);
+    right: clamp(8px, 2vw, 20px);
+    background: #111;
+    color: #fff;
+    font-family: 'SanzuFont', 'Comic Sans MS', cursive;
+    font-size: clamp(1rem, 3vw, 1.5rem);
+    padding: clamp(6px, 1.2vw, 12px) clamp(10px, 2vw, 20px);
+    border-radius: 8px;
+    z-index: 20;
+    pointer-events: none;
+    letter-spacing: 0.02em;
 }
 
-.btn-start {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: clamp(10px, 2.5vw, 16px) clamp(22px, 5vw, 40px);
-  background: var(--white);
-  color: var(--black);
-  font-family: var(--font);
-  font-size: clamp(0.9rem, 2.5vw, 1.15rem);
-  border: none;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+/* ── Mute button ──────────────────────────────────────────── */
+
+#mute-btn {
+    position: fixed;
+    bottom: clamp(10px, 2vw, 18px);
+    right: clamp(10px, 2vw, 18px);
+    background: #111;
+    border: none;
+    border-radius: 50%;
+    width: clamp(36px, 6vw, 48px);
+    height: clamp(36px, 6vw, 48px);
+    cursor: pointer;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.75;
+    transition: opacity 0.2s;
 }
 
-.btn-start:hover {
-  background: var(--grey-light);
+#mute-btn:hover { opacity: 1; }
+
+#mute-btn img {
+    width: 55%;
+    height: 55%;
+    object-fit: contain;
 }
 
-.btn-start:active {
-  background: var(--grey-mid);
+/* ── Game-over additions ──────────────────────────────────── */
+
+.gameover-score {
+    font-size: clamp(1rem, 3vw, 1.4rem) !important;
+    color: #111 !important;
+    font-weight: bold;
 }
 
-.github-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: clamp(0.75rem, 2vw, 0.9rem);
-  color: var(--grey-mid);
-  text-decoration: none;
-  transition: color 0.15s;
-}
-
-.github-link:hover {
-  color: var(--white);
-}
-
-/* ── Live score ───────────────────────────────────────────── */
-
-.score-display {
-  position: fixed;
-  top: clamp(14px, 3vw, 24px);
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: var(--font);
-  font-size: clamp(1.6rem, 5vw, 2.6rem);
-  color: var(--white);
-  z-index: 5;
-  pointer-events: none;
-  letter-spacing: -0.01em;
+.gameover-best {
+    font-size: clamp(0.7rem, 2vw, 1rem) !important;
+    color: #555 !important;
 }

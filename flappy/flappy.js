@@ -23,11 +23,20 @@ function showUI() { uiEl.classList.remove('hidden'); }
 
 let muted = false;
 
+const bgm = new Audio('src/sounds/bgm.mp3');
+bgm.loop   = true;
+bgm.volume = 0.35;
+
 muteBtn.addEventListener('click', () => {
-    muted = !muted;
+    muted        = !muted;
     muteIcon.src = muted ? 'src/icons/mute.png' : 'src/icons/unmute.png';
     muteIcon.alt = muted ? 'mute' : 'unmute';
+    bgm.muted    = muted;
 });
+
+function startBgm() {
+    if (!muted) bgm.play().catch(() => {});
+}
 
 function playSound(file) {
     if (muted) return;
@@ -209,6 +218,7 @@ function loop() {
 }
 
 function startGame() {
+    if (!gameStarted) startBgm();
     gameStarted = true;
     resetGame();
     hideUI();

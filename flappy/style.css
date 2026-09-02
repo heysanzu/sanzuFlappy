@@ -1,1 +1,141 @@
+@font-face {
+  font-family: "Sanzu";
+  src: url("https://github.com/heysanzu/sanzu/raw/main/fonts/comic_sans_regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
 
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --black: #0d0d0d;
+  --white: #f5f5f5;
+  --grey-light: #e0e0e0;
+  --grey-mid: #9e9e9e;
+  --grey-dark: #3a3a3a;
+  --font: "Sanzu", "Comic Sans MS", cursive;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background: var(--black);
+  overflow: hidden;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font);
+}
+
+/* Canvas fills the viewport, capped at a sensible game width */
+#gameCanvas {
+  display: block;
+  background: var(--black);
+  touch-action: none;
+}
+
+/* ── Overlay ─────────────────────────────────────────────── */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  background: rgba(13, 13, 13, 0.82);
+  backdrop-filter: blur(2px);
+  transition: opacity 0.25s ease;
+}
+
+.overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.overlay-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(12px, 3vw, 22px);
+}
+
+.game-title {
+  font-family: var(--font);
+  font-size: clamp(2.8rem, 10vw, 5.5rem);
+  color: var(--white);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.overlay-score {
+  font-size: clamp(1rem, 3.5vw, 1.6rem);
+  color: var(--grey-light);
+}
+
+.overlay-best {
+  font-size: clamp(0.8rem, 2.5vw, 1.1rem);
+  color: var(--grey-mid);
+}
+
+.hidden {
+  display: none !important;
+}
+
+.btn-start {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: clamp(10px, 2.5vw, 16px) clamp(22px, 5vw, 40px);
+  background: var(--white);
+  color: var(--black);
+  font-family: var(--font);
+  font-size: clamp(0.9rem, 2.5vw, 1.15rem);
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn-start:hover {
+  background: var(--grey-light);
+}
+
+.btn-start:active {
+  background: var(--grey-mid);
+}
+
+.github-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: clamp(0.75rem, 2vw, 0.9rem);
+  color: var(--grey-mid);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.github-link:hover {
+  color: var(--white);
+}
+
+/* ── Live score ───────────────────────────────────────────── */
+
+.score-display {
+  position: fixed;
+  top: clamp(14px, 3vw, 24px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font);
+  font-size: clamp(1.6rem, 5vw, 2.6rem);
+  color: var(--white);
+  z-index: 5;
+  pointer-events: none;
+  letter-spacing: -0.01em;
+}

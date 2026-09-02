@@ -145,9 +145,9 @@ function spawnPipe() {
 
 // ── DRAW ──────────────────────────────────────────────────────
 function drawBackground() {
-    ctx.fillStyle = '#0d0d0d';
+    ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, W, H);
-    ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+    ctx.strokeStyle = 'rgba(0,0,0,0.05)';
     ctx.lineWidth = 1;
     for (let y = 0; y < H; y += 44) {
         ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
@@ -159,19 +159,19 @@ function drawPipe(p) {
     const gap     = pipeGap();
     const bottomY = p.topH + gap;
 
-    ctx.fillStyle = '#1c1c1c';
+    ctx.fillStyle = '#c0c0c0';
     ctx.fillRect(p.x, 0, pw, p.topH);
     ctx.fillRect(p.x, bottomY, pw, H - bottomY - CFG.groundH);
 
-    ctx.fillStyle = '#2e2e2e';
+    ctx.fillStyle = '#a0a0a0';
     ctx.fillRect(p.x - 5, p.topH - 14, pw + 10, 14);
     ctx.fillRect(p.x - 5, bottomY, pw + 10, 14);
 }
 
 function drawGround() {
-    ctx.fillStyle = '#1a1a1a';
+    ctx.fillStyle = '#d0d0d0';
     ctx.fillRect(0, H - CFG.groundH, W, CFG.groundH);
-    ctx.fillStyle = '#2e2e2e';
+    ctx.fillStyle = '#a0a0a0';
     ctx.fillRect(0, H - CFG.groundH, W, 2);
 }
 
@@ -184,7 +184,7 @@ function drawBird() {
     if (birdImg.complete && birdImg.naturalWidth > 0) {
         ctx.drawImage(birdImg, -s / 2, -s / 2, s, s);
     } else {
-        ctx.fillStyle = '#f5f5f5';
+        ctx.fillStyle = '#ffffff';
         ctx.beginPath(); ctx.arc(0, 0, s / 2, 0, Math.PI * 2); ctx.fill();
     }
     ctx.restore();
